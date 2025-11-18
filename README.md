@@ -79,9 +79,9 @@ Password : password123
 Email : cs2@example.com
 Password : password123
 
-Cara Menggunakan Token di Swagger:
-Buka POST /auth/login dan login menggunakan salah satu akun di atas.
-Salin access_token dari respons.
-Klik tombol "Authorize" 🔒 di kanan atas halaman.
-Tempelkan token dengan format: Bearer <token>.
-Klik "Authorize". Sekarang dapat menguji endpoint yang dilindungi.
+Cara Menggunakan Token di Swagger:  
+- Buka POST /auth/login dan login menggunakan salah satu akun di atas.  
+- Salin access_token dari respons.  
+- Klik tombol "Authorize" 🔒 di kanan atas halaman.  
+- Tempelkan token dengan format: Bearer <token>.  
+- Klik "Authorize". Sekarang dapat menguji endpoint yang dilindungi.
