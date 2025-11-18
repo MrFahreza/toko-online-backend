@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   ParseUUIDPipe,
+  Query,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -27,6 +28,7 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '@prisma/client';
 import { ProductResponseDto } from './dto/product-response.dto';
 import { ProductListResponseDto } from './dto/product-list-response.dto';
+import { PageOptionsDto } from 'src/common/dto/page-options.dto';
 
 @ApiTags('2. Products')
 @ApiBearerAuth() // Menandakan endpoint ini butuh Bearer Token
@@ -48,10 +50,10 @@ export class ProductsController {
   // Endpoint untuk melihat semua produk (Semua user terotentikasi)
   @Get()
   @UseGuards(JwtAuthGuard)
-  @ApiOperation({ summary: 'Lihat semua produk (Semua user login)' })
+  @ApiOperation({ summary: 'Lihat semua produk (Pagination)' })
   @ApiOkResponse({ type: ProductListResponseDto })
-  findAll() {
-    return this.productsService.findAll();
+  findAll(@Query() pageOptionsDto: PageOptionsDto) {
+    return this.productsService.findAll(pageOptionsDto);
   }
 
   // Endpoint untuk melihat satu produk (Semua user terotentikasi)

@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { PageOptionsDto } from 'src/common/dto/page-options.dto';
 
 @Injectable()
 export class ProductsService {
@@ -13,10 +14,18 @@ export class ProductsService {
   }
 
   // Mendapatkan semua produk
-  findAll() {
-    return this.prisma.product.findMany({
+  async findAll(pageOptionsDto: PageOptionsDto) {
+    const { page = 1, limit = 10 } = pageOptionsDto;
+    
+    const skip = (page - 1) * limit;
+
+    const products = await this.prisma.product.findMany({
+      skip: skip,      // <-- Lewati data sebelumnya
+      take: limit,     // <-- Ambil sejumlah limit
       orderBy: { createdAt: 'desc' },
     });
+
+    return products;
   }
 
   // Mendapatkan satu produk berdasarkan ID
