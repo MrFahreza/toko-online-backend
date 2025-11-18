@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   ForbiddenException,
+  BadRequestException,
 } from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
 import { AddToCartDto } from './dto/add-to-cart.dto';
@@ -61,52 +62,71 @@ export class CartService {
   // Menambah atau mengupdate item di cart
   async addItemToCart(userId: string, dto: AddToCartDto) {
     const { productId, quantity } = dto;
-    const cart = await this.getOrCreateUserCart(userId);
 
-    // Cek apakah produk ada
-    const product = await this.prisma.product.findUnique({
-      where: { id: productId },
-    });
+    const [product, cart] = await Promise.all([
+      this.prisma.product.findUnique({
+        where: { id: productId },
+        select: { id: true, name: true, stock: true },
+      }),
+      this.prisma.cart.findUnique({
+        where: { userId },
+        include: {
+          items: { where: { productId: productId } },
+          _count: { select: { items: true } }
+        },
+      }),
+    ]);
+
     if (!product) {
       throw new NotFoundException('Produk tidak ditemukan');
     }
 
-    // Cek apakah item sudah ada di cart
-    const existingItem = await this.prisma.cartItem.findUnique({
-      where: {
-        cartId_productId: {
-          cartId: cart.id,
-          productId: productId,
-        },
-      },
-    });
+    let targetCartId: string;
+    let existingItem: any = null;
+    const currentItemCount = cart?._count?.items ?? 0;
+    if (!cart) {
+      const newCart = await this.prisma.cart.create({ data: { userId } });
+      targetCartId = newCart.id;
+    } else {
+      targetCartId = cart.id;
+      // Cek apakah item produk ini sudah ada di cart
+      if (cart.items.length > 0) {
+        existingItem = cart.items[0];
+      }
+    }
+
+    // Hanya cek jika kita menambah item BARU (existingItem null)
+    if (!existingItem && currentItemCount >= 20) {
+       throw new BadRequestException('Keranjang penuh! Maksimal 20 jenis barang.');
+    }
 
     if (existingItem) {
+      // Jika item sudah ada, update jumlahnya
       const newQuantity = existingItem.quantity + quantity;
 
       if (newQuantity <= 0) {
-        // Jika kuantitas jadi 0 or negatif, hapus item dari cart
+        // Hapus item jika jumlah <= 0
         await this.prisma.cartItem.delete({
           where: { id: existingItem.id },
         });
       } else {
-        // Jika masih ada, update kuantitasnya
+        // Update jumlah
         await this.prisma.cartItem.update({
           where: { id: existingItem.id },
           data: { quantity: newQuantity },
         });
       }
     } else if (quantity > 0) {
-      // Jika item baru, HANYA buat jika kuantitasnya positif
+      // Jika item belum ada dan quantity positif, buat baru
       await this.prisma.cartItem.create({
         data: {
-          cartId: cart.id,
+          cartId: targetCartId,
           productId: productId,
           quantity: quantity,
         },
       });
     }
-
+    
     return this.getCart(userId);
   }
 
