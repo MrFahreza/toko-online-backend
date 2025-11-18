@@ -81,18 +81,18 @@ npm install
 
 Buat file baru bernama .env di root proyek (toko-online-backend/.env). Salin konten di bawah ini dan isi nilainya sesuai dengan kredensial database.
 
-# --- File: .env ---
+File: .env
 
-# URL ini untuk menjalankan aplikasi (menggunakan PgBouncer)
-# Ganti [USER], [PASSWORD], dan [HOST]
+// URL ini untuk menjalankan aplikasi (menggunakan PgBouncer)
+// Ganti [USER], [PASSWORD], dan [HOST]
 DATABASE_URL="postgresql://[USER]:[PASSWORD]@[HOST]:6543/postgres?pgbouncer=true"
 
-# URL ini HANYA untuk migrasi Prisma
-# Ganti [USER], [PASSWORD], dan [HOST]
+// URL ini HANYA untuk migrasi Prisma
+// Ganti [USER], [PASSWORD], dan [HOST]
 DIRECT_URL="postgresql://[USER]:[PASSWORD]@[HOST]:5432/postgres"
 
-# Kunci rahasia untuk menandatangani JWT
-# Ganti dengan string acak yang kuat
+// Kunci rahasia untuk menandatangani JWT
+// Ganti dengan string acak yang kuat
 JWT_SECRET="RAHASIA-SAYA-YANG-SANGAT-KUAT-DAN-PANJANG-123!"
 
 
