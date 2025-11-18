@@ -1,38 +1,43 @@
 Backend API - Toko Online Sederhana
+
 Ini adalah layanan API backend untuk "Test Project: Mobile App Toko Online Sederhana". Backend ini dibangun menggunakan NestJS, Prisma, dan database PostgreSQL untuk menyediakan API yang aman, real-time, dan skalabel.
 
 Backend ini tidak hanya memenuhi semua spesifikasi fungsional, tetapi juga mencakup beberapa improvement production grade untuk menunjukkan arsitektur yang matang.
 
 🚀 Fitur Utama
+
 Fungsional (Sesuai Spesifikasi)
-Autentikasi & Otorisasi: Sistem login berbasis JWT penuh dengan Role Based Access Control (RBAC) untuk 3 peran: PEMBELI, CS1, dan CS2
 
-Manajemen Produk: Operasi CRUD penuh pada produk, dilindungi oleh role CS
+Autentikasi & Otorisasi: Sistem login berbasis JWT penuh dengan Role Based Access Control (RBAC) untuk 3 peran: PEMBELI, CS1, dan CS2.
 
-Manajemen Keranjang: Logika keranjang yang aman dan terisolasi per pengguna (PEMBELI)
+Manajemen Produk: Operasi CRUD penuh pada produk, dilindungi oleh role CS.
 
-Alur Pesanan Lengkap: Logika transaksi penuh mulai dari checkout, upload-proof, approve-payment (termasuk pengurangan stok), reject-payment, update-status (DIKIRIM, SELESAI), hingga pembeli mengonfirmasi pesanan
+Manajemen Keranjang: Logika keranjang yang aman dan terisolasi per pengguna (PEMBELI).
 
-Dokumentasi API: Dokumentasi API Swagger (OpenAPI) yang dibuat secara otomatis
+Alur Pesanan Lengkap: Logika transaksi penuh mulai dari checkout, upload-proof, approve-payment (termasuk pengurangan stok), reject-payment, update-status (DIKIRIM, SELESAI), hingga pembeli mengonfirmasi pesanan.
+
+Dokumentasi API: Dokumentasi API Swagger (OpenAPI) yang dibuat secara otomatis.
 
 Fitur Tambahan (Improvement)
-Notifikasi Real-time (WebSocket): Menggunakan NestJS Gateway (Socket.io) untuk mendorong (push) notifikasi ke client (Flutter) secara instan
 
-Pembeli mendapat pembaruan status (status_update) secara real time
+Notifikasi Real time (WebSocket): Menggunakan NestJS Gateway (Socket.io) untuk mendorong (push) notifikasi ke client (Flutter) secara instan.
 
-CS1 dan CS2 mendapat notifikasi tugas baru (new_task) saat pesanan masuk ke antrean mereka
+Pembeli mendapat pembaruan status (status_update) secara real time.
 
-Auto Cancel Proaktif (Cron Job): Menggunakan NestJS Schedule (@Cron) untuk menjalankan job setiap 5 menit yang secara proaktif membatalkan pesanan yang kedaluwarsa, alih-alih mengecek saat di-load
+CS1 dan CS2 mendapat notifikasi tugas baru (new_task) saat pesanan masuk ke antrean mereka.
 
-Membatalkan pesanan MENUNGGU_UPLOAD_BUKTI yang lebih dari 24 jam
+Auto Cancel Proaktif (Cron Job): Menggunakan NestJS Schedule (@Cron) untuk menjalankan job setiap 5 menit yang secara proaktif membatalkan pesanan yang kedaluwarsa, alih-alih mengecek saat di-load.
 
-Membatalkan pesanan MENUNGGU_VERIFIKASI_CS1 yang lebih dari 24 jam
+Membatalkan pesanan MENUNGGU_UPLOAD_BUKTI yang lebih dari 24 jam.
 
-Respon API Standar: Menggunakan Global Interceptor untuk memastikan semua respon sukses dari API memiliki format yang konsisten ({ statusCode, message, data })
+Membatalkan pesanan MENUNGGU_VERIFIKASI_CS1 yang lebih dari 24 jam.
 
-Validasi Input: Menggunakan DTO class-validator untuk semua endpoint guna memastikan integritas data dan error handling yang bersih
+Respon API Standar: Menggunakan Global Interceptor untuk memastikan semua respon sukses dari API memiliki format yang konsisten ({ statusCode, message, data }).
+
+Validasi Input: Menggunakan DTO class-validator untuk semua endpoint guna memastikan integritas data dan error handling yang bersih.
 
 🛠️ Tech Stack
+
 Framework: NestJS
 
 ORM: Prisma
@@ -50,7 +55,9 @@ Validasi: class-validator, class-transformer
 Dokumentasi: Swagger (@nestjs/swagger)
 
 ⚙️ Instalasi dan Menjalankan
+
 1. Prasyarat
+
 Node.js (v18 atau lebih baru)
 
 NPM
@@ -58,77 +65,92 @@ NPM
 Koneksi ke database PostgreSQL
 
 2. Kloning Repository
-bash
+
 git clone https://github.com/MrFahreza/toko-online-backend.git
+
+
 cd toko-online-backend
+
+
 3. Instalasi Dependensi
-bash
+
 npm install
+
+
 4. Setup Environment Variables
+
 Buat file baru bernama .env di root proyek (toko-online-backend/.env). Salin konten di bawah ini dan isi nilainya sesuai dengan kredensial database.
 
 File: .env
 
-env
-# URL ini untuk menjalankan aplikasi (menggunakan PgBouncer)
-# Ganti [USER], [PASSWORD], dan [HOST]
+// URL ini untuk menjalankan aplikasi (menggunakan PgBouncer)
+// Ganti [USER], [PASSWORD], dan [HOST]
 DATABASE_URL="postgresql://[USER]:[PASSWORD]@[HOST]:6543/postgres?pgbouncer=true"
 
-# URL ini HANYA untuk migrasi Prisma
-# Ganti [USER], [PASSWORD], dan [HOST]
+// URL ini HANYA untuk migrasi Prisma
+// Ganti [USER], [PASSWORD], dan [HOST]
 DIRECT_URL="postgresql://[USER]:[PASSWORD]@[HOST]:5432/postgres"
 
-# Kunci rahasia untuk menandatangani JWT
-# Ganti dengan string acak yang kuat
+// Kunci rahasia untuk menandatangani JWT
+// Ganti dengan string acak yang kuat
 JWT_SECRET="RAHASIA-SAYA-YANG-SANGAT-KUAT-DAN-PANJANG-123!"
-5. Setup Database (Migrasi & Seed)
-Perintah ini akan membuat semua tabel di database:
 
-bash
+
+5. Setup Database (Migrasi & Seed)
+
+Perintah ini akan membuat semua tabel di database 
+
 npx prisma migrate dev
+
+
 Perintah ini akan mengisi database dengan akun default dan data produk:
 
-bash
 npx prisma db seed
+
+
 6. Jalankan Server Development
-bash
+
 npm run start:dev
+
+
 Server akan berjalan di http://localhost:3000
 
 Dokumentasi Swagger akan tersedia di http://localhost:3000/docs
 
 🧪 Akun Default (Testing)
+
 Setelah menjalankan npx prisma db seed, dapat menggunakan akun berikut untuk menguji berbagai peran di Swagger:
 
-Pembeli
-Email: pembeli@example.com
+* Pembeli
 
-Password: password123
+Email : pembeli@example.com
 
-CS Layer 1
-Email: cs1@example.com
+Password : password123
 
-Password: password123
 
-CS Layer 2
-Email: cs2@example.com
 
-Password: password123
+* CS Layer 1
+
+Email : cs1@example.com
+
+Password : password123
+
+
+
+* CS Layer 2
+
+Email : cs2@example.com
+
+Password : password123
 
 Cara Menggunakan Token di Swagger:
-Buka POST /auth/login dan login menggunakan salah satu akun di atas
 
-Salin access_token dari respons
+Buka POST /auth/login dan login menggunakan salah satu akun di atas.
 
-Klik tombol "Authorize" 🔒 di kanan atas halaman
+Salin access_token dari respons.
 
-Tempelkan token dengan format: Bearer <token>
+Klik tombol "Authorize" 🔒 di kanan atas halaman.
 
-Klik "Authorize". Sekarang dapat menguji endpoint yang dilindungi
+Tempelkan token dengan format: Bearer <token>.
 
-📚 Dokumentasi API
-Setelah server berjalan, dokumentasi API lengkap dapat diakses melalui:
-
-Swagger UI: http://localhost:3000/docs
-
-JSON Spec: http://localhost:3000/docs-json
+Klik "Authorize". Sekarang dapat menguji endpoint yang dilindungi.
