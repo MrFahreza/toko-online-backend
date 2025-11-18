@@ -37,13 +37,13 @@ Fitur Tambahan (Improvement)
 - Koneksi ke database PostgreSQL
 
 2. Kloning Repository
-git clone https://github.com/MrFahreza/toko-online-backend.git
-cd toko-online-backend
+- git clone https://github.com/MrFahreza/toko-online-backend.git
+- cd toko-online-backend
 
 3. Instalasi Dependensi
-npm install
+- npm install
 
-4. Setup Environment Variables
+4. Setup Environment Variables  
 Buat file baru bernama .env di root proyek (toko-online-backend/.env). Salin konten di bawah ini dan isi nilainya sesuai dengan kredensial database.
 File: .env
 
