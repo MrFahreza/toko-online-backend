@@ -3,6 +3,7 @@ import { PrismaService } from 'prisma/prisma.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { PageOptionsDto } from 'src/common/dto/page-options.dto';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class ProductsService {
@@ -15,13 +16,21 @@ export class ProductsService {
 
   // Mendapatkan semua produk
   async findAll(pageOptionsDto: PageOptionsDto) {
-    const { page = 1, limit = 10 } = pageOptionsDto;
-    
+    const { page = 1, limit = 10, search } = pageOptionsDto;
     const skip = (page - 1) * limit;
+    const whereCondition: Prisma.ProductWhereInput = search
+      ? {
+          name: {
+            contains: search,
+            mode: 'insensitive',
+          },
+        }
+      : {};
 
     const products = await this.prisma.product.findMany({
-      skip: skip,      // <-- Lewati data sebelumnya
-      take: limit,     // <-- Ambil sejumlah limit
+      skip: skip,
+      take: limit,
+      where: whereCondition,
       orderBy: { createdAt: 'desc' },
     });
 

@@ -53,13 +53,13 @@ DIRECT_URL="postgresql://[USER]:[PASSWORD]@[HOST]:5432/postgres"
 JWT_SECRET="RAHASIA-SAYA-YANG-SANGAT-KUAT-DAN-PANJANG-123!"
 
 5. Setup Database (Migrasi & Seed)
-- Perintah ini akan membuat semua tabel di database 
+- Perintah ini akan membuat semua tabel di database   
 npx prisma migrate dev
 
-- Perintah ini akan mengisi database dengan akun default dan data produk
+- Perintah ini akan mengisi database dengan akun default dan data produk  
 npx prisma db seed
 
-6. Jalankan Server Development
+6. Jalankan Server Development  
 npm run start:dev
 
 - Server akan berjalan di http://localhost:3000
