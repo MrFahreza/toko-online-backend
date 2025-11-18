@@ -1,0 +1,99 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ------ ENUMS ------
+enum Role {
+  PEMBELI // Role untuk pembeli biasa
+  CS1     // Role untuk CS Layer 1 (Verifikasi)
+  CS2     // Role untuk CS Layer 2 (Proses)
+}
+
+enum OrderStatus {
+  MENUNGGU_UPLOAD_BUKTI
+  MENUNGGU_VERIFIKASI_CS1
+  MENUNGGU_DIPROSES_CS2
+  DIBATALKAN
+  SEDANG_DIPROSES
+  DIKIRIM
+  SELESAI
+}
+
+// ------ MODELS ------
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      Role     @default(PEMBELI)
+  cart   Cart?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  orders Order[]
+}
+
+model Product {
+  id           String    @id @default(uuid())
+  name         String    @unique
+  price        Float
+  stock        Int
+  thumbnailUrl String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  orderItems OrderItem[]
+  cartItems    CartItem[]
+}
+
+model Order {
+  id        String      @id @default(uuid())
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  status    OrderStatus @default(MENUNGGU_UPLOAD_BUKTI)
+  buyerName    String
+  buyerPhone   String
+  buyerAddress String
+  totalPrice      Float
+  paymentProofUrl String?
+  buyerId String
+  buyer   User   @relation(fields: [buyerId], references: [id])
+  items OrderItem[]
+}
+
+model OrderItem {
+  id       String @id @default(uuid())
+  quantity Int
+  price    Float
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id])
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  @@map("order_items")
+}
+
+model Cart {
+  id        String     @id @default(uuid())
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  userId    String     @unique 
+  user      User       @relation(fields: [userId], references: [id])
+  items     CartItem[]
+
+  @@map("carts")
+}
+
+model CartItem {
+  id        String   @id @default(uuid())
+  quantity  Int
+  cartId    String
+  cart      Cart     @relation(fields: [cartId], references: [id])
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+  @@unique([cartId, productId])
+  @@map("cart_items")
+}
