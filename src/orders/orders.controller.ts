@@ -139,6 +139,12 @@ export class OrdersController {
     return this.ordersService.updateOrderStatus(id, updateStatusDto);
   }
 
+  @Get('cs2/history')
+  @Roles(Role.CS2)
+  getCs2History() {
+    return this.ordersService.getCs2History();
+  }
+
   // --- Endpoint Umum (Detail) ---
   @Get(':id')
   @Roles(Role.PEMBELI, Role.CS1, Role.CS2)

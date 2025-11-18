@@ -342,7 +342,11 @@ export class OrdersService {
   // Merupakan logika mendapatkan list proses (CS2)
   async getPendingProcessing() {
     return this.prisma.order.findMany({
-      where: { status: OrderStatus.MENUNGGU_DIPROSES_CS2 },
+      where: {
+        status: {
+          in: [OrderStatus.MENUNGGU_DIPROSES_CS2, OrderStatus.SEDANG_DIPROSES]
+        }
+      },
       include: fullOrderInclude,
       orderBy: { createdAt: 'asc' },
     });
@@ -377,6 +381,18 @@ export class OrdersService {
     // Kirim notifikasi ke Pembeli
     this.notifyStatusChange(updatedOrder);
     return updatedOrder;
+  }
+
+  async getCs2History() {
+    return this.prisma.order.findMany({
+      where: {
+        status: {
+          in: [OrderStatus.DIKIRIM, OrderStatus.SELESAI]
+        }
+      },
+      include: fullOrderInclude,
+      orderBy: { updatedAt: 'desc' },
+    });
   }
 
   // --- LOGIKA UMUM ---
