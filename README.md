@@ -65,7 +65,7 @@ npm run start:dev
 - Server akan berjalan di http://localhost:3000
 - Dokumentasi Swagger akan tersedia di http://localhost:3000/docs
 
-🧪 Akun Default (Testing)
+🧪 Akun Default (Testing)  
 Setelah menjalankan npx prisma db seed, dapat menggunakan akun berikut untuk menguji berbagai peran di Swagger:
 * Pembeli
 Email : pembeli@example.com
