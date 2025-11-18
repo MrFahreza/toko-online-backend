@@ -47,23 +47,16 @@ npm install
 Buat file baru bernama .env di root proyek (toko-online-backend/.env). Salin konten di bawah ini dan isi nilainya sesuai dengan kredensial database.
 File: .env
 
-// URL ini untuk menjalankan aplikasi (menggunakan PgBouncer)
-// Ganti [USER], [PASSWORD], dan [HOST]
 DATABASE_URL="postgresql://[USER]:[PASSWORD]@[HOST]:6543/postgres?pgbouncer=true"
 
-// URL ini HANYA untuk migrasi Prisma
-// Ganti [USER], [PASSWORD], dan [HOST]
 DIRECT_URL="postgresql://[USER]:[PASSWORD]@[HOST]:5432/postgres"
-
-// Kunci rahasia untuk menandatangani JWT
-// Ganti dengan string acak yang kuat
 JWT_SECRET="RAHASIA-SAYA-YANG-SANGAT-KUAT-DAN-PANJANG-123!"
 
 5. Setup Database (Migrasi & Seed)
-// Perintah ini akan membuat semua tabel di database 
+- Perintah ini akan membuat semua tabel di database 
 npx prisma migrate dev
 
-// Perintah ini akan mengisi database dengan akun default dan data produk:
+- Perintah ini akan mengisi database dengan akun default dan data produk
 npx prisma db seed
 
 6. Jalankan Server Development
