@@ -110,6 +110,14 @@ export class OrdersController {
     return this.ordersService.rejectPayment(id);
   }
 
+  @Get('cs1/history')
+  @Roles(Role.CS1)
+  @ApiOperation({ summary: 'Melihat riwayat semua pesanan masuk (CS1)' })
+  @ApiOkResponse({ type: OrderListResponseDto })
+  getCs1History() {
+    return this.ordersService.getCs1History();
+  }
+
   // --- Endpoint CS Layer 2 ---
   @Get('pending/processing')
   @Roles(Role.CS2)

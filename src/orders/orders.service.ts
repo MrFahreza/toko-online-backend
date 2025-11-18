@@ -318,6 +318,26 @@ export class OrdersService {
     return updatedOrder;
   }
 
+  // Merupakan logika history untuk CS1
+  async getCs1History() {
+    return this.prisma.order.findMany({
+      where: {
+        // Tampilkan semua pesanan KECUALI yang baru dibuat (belum upload bukti)
+        status: {
+          not: OrderStatus.MENUNGGU_UPLOAD_BUKTI,
+        },
+      },
+      include: {
+        items: {
+          include: {
+            product: true,
+          },
+        },
+      },
+      orderBy: { updatedAt: 'desc' }, // Yang terbaru di atas
+    });
+  }
+
   // --- LOGIKA UNTUK CS LAYER 2 ---
   // Merupakan logika mendapatkan list proses (CS2)
   async getPendingProcessing() {
