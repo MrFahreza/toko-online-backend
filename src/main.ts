@@ -3,9 +3,18 @@ import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
+import helmet from 'helmet';
+import { json, urlencoded } from 'express';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  // Aktifkan Helmet
+  app.use(helmet());
+
+  // Batasi ukuran payload (Mencegah DoS via upload file raksasa)
+  app.use(json({ limit: '10mb' })); // Membatasi JSON body
+  app.use(urlencoded({ extended: true, limit: '10mb' }));
 
   // Menambahkan CORS
   app.enableCors();

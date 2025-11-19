@@ -10,14 +10,26 @@ import { CartModule } from './cart/cart.module';
 import { OrdersModule } from './orders/orders.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { EventsModule } from './events/events.module';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [ConfigModule.forRoot({ isGlobal: true }), PrismaModule, AuthModule,ScheduleModule.forRoot(),
     UsersModule,
     ProductsModule,
     CartModule,
-    OrdersModule,EventsModule],
+    OrdersModule,EventsModule,
+    ThrottlerModule.forRoot([{
+      ttl: 60,
+      limit: 20,
+    }]),
+  ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+  ],
 })
 export class AppModule {}
