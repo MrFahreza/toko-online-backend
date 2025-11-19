@@ -34,21 +34,53 @@ export class OrdersService {
   // --- LOGIKA NOTIFIKASI WEBSOCKET ---
   // Merupakan helper untuk mengirim notifikasi WebSocket
   private notifyStatusChange(order: Order) {
-    // Kirim notifikasi ke Pembeli (via room pribadi 'user_[id]')
-    this.eventsGateway.sendToUser(order.buyerId, 'status_update', order);
-    this.logger.log(`Notif terkirim ke User: ${order.buyerId}`);
+    const shortId = order.id.substring(0, 8).toUpperCase();
+    
+    // 1. NOTIFIKASI KE PEMBELI (Selalu kirim update status)
+    // Buat pesan yang ramah untuk pembeli
+    let buyerMessage = `Status pesanan #${shortId} diperbarui menjadi ${order.status}`;
+    if (order.status === OrderStatus.SEDANG_DIPROSES) buyerMessage = `Pesanan #${shortId} sedang dikemas oleh Gudang.`;
+    if (order.status === OrderStatus.DIKIRIM) buyerMessage = `Pesanan #${shortId} telah dikirim!`;
+    if (order.status === OrderStatus.SELESAI) buyerMessage = `Pesanan #${shortId} selesai. Terima kasih!`;
+    if (order.status === OrderStatus.DIBATALKAN) buyerMessage = `Pesanan #${shortId} telah dibatalkan.`;
 
-    // Kirim notifikasi ke Role CS terkait (via room role 'role_[roleName]')
+    this.eventsGateway.sendToUser(order.buyerId, 'status_update', {
+      id: order.id,
+      status: order.status,
+      message: buyerMessage, // <-- Pesan Dinamis
+    });
+
+    // 2. NOTIFIKASI KE ROLE (CS1 / CS2)
+    // Tentukan siapa yang harus bekerja atau tahu info ini
     let targetRole: Role | null = null;
+    let taskMessage = '';
+
+    // Logic Routing Notifikasi
     if (order.status === OrderStatus.MENUNGGU_VERIFIKASI_CS1) {
       targetRole = Role.CS1;
-    } else if (order.status === OrderStatus.MENUNGGU_DIPROSES_CS2) {
+      taskMessage = `Tugas Baru: Verifikasi Pembayaran #${shortId}`;
+    } 
+    else if (order.status === OrderStatus.MENUNGGU_DIPROSES_CS2) {
       targetRole = Role.CS2;
+      taskMessage = `Tugas Baru: Packing Pesanan #${shortId}`;
+    }
+    // Kasus Khusus: Ketika Pembeli klik "Selesai", CS2 harus tahu (untuk update history)
+    else if (order.status === OrderStatus.SELESAI) {
+       // Kita kirim event khusus 'order_finished' ke CS2 agar history mereka update
+       this.eventsGateway.sendToRole(Role.CS2, 'order_finished', {
+         id: order.id,
+         message: `Pesanan #${shortId} telah diterima Pembeli (Selesai).`
+       });
+       return; // Keluar, karena logic di bawah untuk 'new_task'
     }
 
+    // Kirim 'new_task' jika ada target role
     if (targetRole) {
-      this.eventsGateway.sendToRole(targetRole, 'new_task', order);
-      this.logger.log(`Notif terkirim ke Role: ${targetRole}`);
+      this.eventsGateway.sendToRole(targetRole, 'new_task', {
+        id: order.id,
+        status: order.status,
+        message: taskMessage,
+      });
     }
   }
 
